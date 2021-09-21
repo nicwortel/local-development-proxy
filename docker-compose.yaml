@@ -1,0 +1,24 @@
+version: '3.5'
+
+services:
+  traefik:
+    image: traefik
+    command:
+      - '--api'
+      - '--api.insecure=true'
+      - '--providers.docker'
+      - '--providers.docker.exposedByDefault=false'
+      - '--providers.docker.network=web'
+      - '--entrypoints.web.address=:80'
+    restart: always
+    ports:
+      - '80:80'
+      - '8080:8080'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - web
+
+networks:
+  web:
+    name: web
