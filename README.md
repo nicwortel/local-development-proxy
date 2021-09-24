@@ -24,6 +24,10 @@ cd local-development-proxy
 docker-compose up -d
 ```
 
+After doing this once, the proxy container will start up automatically when Docker starts (for example after rebooting
+your machine), thanks to the line
+[`restart: always`](https://github.com/nicwortel/local-development-proxy/blob/master/docker-compose.yaml#L13).
+
 ### Usage
 
 In order to connect with the reverse proxy and expose your application, add this to the `docker-composer.yaml` of your
