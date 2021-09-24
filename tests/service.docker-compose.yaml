@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  service:
+    image: nginx
+    networks:
+      - workspace
+      - default
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.test-service.rule: 'Host(`test.localhost`)'
+      traefik.http.routers.test-service.entrypoints: web
+      traefik.docker.network: web
+
+networks:
+  workspace:
+    external:
+      name: web

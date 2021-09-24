@@ -1,0 +1,25 @@
+name: Test
+on: push
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Start the development proxy
+        run: docker-compose up -d
+
+      - name: Start the test service
+        run: docker-compose -f tests/service.docker-compose.yaml up -d
+
+      - name: Wait for the test service to start
+        run: sleep 1
+
+      - name: Send a request to the test service
+        run: curl --fail --output test.html http://test.localhost
+
+      - name: Assert that the response contains "Welcome to nginx!"
+        run: grep 'Welcome to nginx!' test.html
