@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   service:
     image: nginx

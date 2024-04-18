@@ -44,8 +44,6 @@ In order to connect with the reverse proxy and expose your application, add this
 project:
 
 ```diff
- version: '3.7'
-
  services:
    web:
      image: my/image
