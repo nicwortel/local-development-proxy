@@ -31,7 +31,7 @@ labels to the application's `docker-compose.yaml`.
 ```shell
 git clone git@github.com:nicwortel/local-development-proxy.git
 cd local-development-proxy
-docker-compose up -d
+docker compose up -d
 ```
 
 After doing this once, the proxy container will start up automatically when Docker starts (for example after rebooting
