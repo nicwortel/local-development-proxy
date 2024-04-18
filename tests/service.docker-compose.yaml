@@ -2,7 +2,7 @@ services:
   service:
     image: nginx
     networks:
-      - workspace
+      - web
       - default
     labels:
       traefik.enable: 'true'
@@ -11,6 +11,5 @@ services:
       traefik.docker.network: web
 
 networks:
-  workspace:
-    external:
-      name: web
+  web:
+    external: true
