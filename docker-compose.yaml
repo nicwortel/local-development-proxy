@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik
+    image: traefik:3
     command:
       - '--api'
       - '--api.insecure=true'
