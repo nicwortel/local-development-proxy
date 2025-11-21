@@ -10,10 +10,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Start the development proxy
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Start the test service
-        run: docker-compose -f tests/service.docker-compose.yaml up -d
+        run: docker compose -f tests/service.docker-compose.yaml up -d
 
       - name: Wait for the test service to start
         run: sleep 1
