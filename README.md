@@ -2,23 +2,23 @@
 
 Running multiple Docker (microservice) containers on the same local machine can introduce some challenges: only one
 container can bind to port 80 at any given time, and assuming that every microservice has their
-own `docker-compose.yaml`, it can be difficult to make multiple microservices communicate with each other.
+own `compose.yaml`, it can be difficult to make multiple microservices communicate with each other.
 In production, you might use a container orchestration tool (such as Kubernetes) which takes care of these issues, but
 running Kubernetes on your local machine is usually overkill.
 
-This repository contains a simple `docker-compose.yaml` file that runs an instance of
+This repository contains a simple `compose.yaml` file that runs an instance of
 [Traefik Proxy](https://traefik.io/traefik/) for local development purposes. This allows you to run multiple web
 services locally, without port conflicts, each with their own domain name.
 
 ## How it works
 
-The `docker-compose.yaml` in this repository creates a new Docker network and starts an instance of Traefik, a reverse
+The `compose.yaml` in this repository creates a new Docker network and starts an instance of Traefik, a reverse
 proxy. Port 80 of the Traefik container is mapped to port 80 of the host. Other applications (with their
-own `docker-compose.yaml`) can connect to the shared network and will be proxied by Traefik instead of publishing their
+own `compose.yaml`) can connect to the shared network and will be proxied by Traefik instead of publishing their
 ports on the host machine.
 
 Traefik can be configured using Docker labels, so exposing a new application is a matter of adding a network and some
-labels to the application's `docker-compose.yaml`.
+labels to the application's `compose.yaml`.
 
 ## Getting started
 
@@ -36,11 +36,11 @@ docker compose up -d
 
 After doing this once, the proxy container will start up automatically when Docker starts (for example after rebooting
 your machine), thanks to the line
-[`restart: always`](https://github.com/nicwortel/local-development-proxy/blob/master/docker-compose.yaml#L13).
+[`restart: always`](https://github.com/nicwortel/local-development-proxy/blob/master/compose.yaml#L13).
 
 ### Usage
 
-In order to connect with the reverse proxy and expose your application, add this to the `docker-composer.yaml` of your
+In order to connect with the reverse proxy and expose your application, add this to the `compose.yaml` of your
 project:
 
 ```diff
