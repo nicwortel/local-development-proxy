@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:3
+    image: docker.io/library/traefik:3
     command:
       - '--api'
       - '--api.insecure=true'

@@ -1,7 +1,7 @@
 # Local development proxy
 
-Running multiple Docker (microservice) containers on the same local machine can introduce some challenges: only one
-container can bind to port 80 at any given time, and assuming that every microservice has their
+Running multiple (Docker or Podman) microservice containers on the same local machine can introduce some challenges:
+only one container can bind to port 80 at any given time, and assuming that every microservice has their
 own `compose.yaml`, it can be difficult to make multiple microservices communicate with each other.
 In production, you might use a container orchestration tool (such as Kubernetes) which takes care of these issues, but
 running Kubernetes on your local machine is usually overkill.
@@ -24,9 +24,12 @@ labels to the application's `compose.yaml`.
 
 ### Requirements
 
-- [Docker](https://docs.docker.com/get-docker/) & [Docker Compose](https://docs.docker.com/compose/install/)
+Either:
 
-### Installation
+- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
+- or [Podman](https://podman.io/) with a Compose provider (`podman-compose` or `docker-compose`), rootless
+
+### Installation (Docker)
 
 ```shell
 git clone git@github.com:nicwortel/local-development-proxy.git
@@ -37,6 +40,45 @@ docker compose up -d
 After doing this once, the proxy container will start up automatically when Docker starts (for example after rebooting
 your machine), thanks to the line
 [`restart: always`](https://github.com/nicwortel/local-development-proxy/blob/master/compose.yaml#L13).
+
+### Installation (Podman)
+
+> [!WARNING]
+> Podman support in this repository is still experimental.
+
+Rootless Podman requires a few one-time changes on the host.
+
+Allow unprivileged processes to bind to port 80 (this makes all ports starting from 80 unprivileged):
+
+```shell
+echo 'net.ipv4.ip_unprivileged_port_start=80' | sudo tee /etc/sysctl.d/99-unprivileged-ports.conf
+sudo sysctl --system
+```
+
+Enable Podman's API socket. This is exposed to Traefik to discover containers and their labels, and the `docker-compose`
+provider uses it to talk to Podman:
+
+```shell
+systemctl --user enable --now podman.socket
+```
+
+Enable the `podman-restart.service`, so that the container restarts after a reboot.
+
+```shell
+systemctl --user enable podman-restart.service
+```
+
+Then start the proxy, including the Podman override file which points Traefik at the Podman socket instead of the
+Docker one:
+
+```shell
+git clone git@github.com:nicwortel/local-development-proxy.git
+cd local-development-proxy
+podman compose -f compose.yaml -f compose.podman.yaml up -d
+```
+
+> [!NOTE]
+> If you also want containers to survive logout or to start before you log in, run `loginctl enable-linger $USER`.
 
 ### Usage
 
