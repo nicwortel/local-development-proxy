@@ -2,12 +2,12 @@ name: Test
 on: push
 
 jobs:
-  test:
-    name: Test
+  docker:
+    name: Docker
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
 
       - name: Start the development proxy
         run: docker compose up -d
@@ -17,6 +17,42 @@ jobs:
 
       - name: Wait for the test service to start
         run: sleep 1
+
+      - name: Send a request to the test service
+        run: curl --fail --output test.html http://test.localhost
+
+      - name: Assert that the response contains "Welcome to nginx!"
+        run: grep 'Welcome to nginx!' test.html
+
+  podman:
+    name: Podman
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v7
+
+      - name: Allow unprivileged processes to bind to port 80
+        run: |
+          echo 'net.ipv4.ip_unprivileged_port_start=80' | sudo tee /etc/sysctl.d/99-unprivileged-ports.conf
+          sudo sysctl --system
+
+      - name: Start the user systemd instance
+        run: |
+          sudo loginctl enable-linger "$USER"
+          sleep 1
+          echo "XDG_RUNTIME_DIR=/run/user/$(id -u)" >> "$GITHUB_ENV"
+
+      - name: Enable the Podman API socket
+        run: systemctl --user enable --now podman.socket
+
+      - name: Start the development proxy
+        run: podman compose -f compose.yaml -f compose.podman.yaml up -d
+
+      - name: Start the test service
+        run: podman compose -f tests/service.docker-compose.yaml up -d
+
+      - name: Wait for the test service to start
+        run: sleep 5
 
       - name: Send a request to the test service
         run: curl --fail --output test.html http://test.localhost
